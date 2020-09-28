@@ -23,7 +23,7 @@ let users = [
 let nextId = shortid.generate()
 
 // GET /users
-server.get("/users", (req, res) => {
+server.get("/api/users", (req, res) => {
     if(users) {
         res.status(200).json({ data: users });
     } else {
@@ -33,16 +33,43 @@ server.get("/users", (req, res) => {
 });
 
 // GET /users by id
-server.get("/users/:id", (req, res) => {
+server.get("/api/users/:id", (req, res) => {
     const id = req.params.id
-    const found = users.find(user => user.id === id)
 
-    if (found) {
-        res.status(200).json({ data: found })
-    } else {
+    try {
+        // retrieve the user from the "database" - try / catch will catch this if there's a failure
+        const found = users.find(user => user.id === id)
+
+        if (found) {
+            res.status(200).json({ data: found })
+            return;
+        }
+
         res.status(404).json({ message: "The user with the specified ID does not exist." })
+   
+    } catch (e) {
+        res.status(500).json({ errorMessage: "The user information could not be retrieved." })
     }
-})
+});
+
+// POST /users
+server.post("/api/users", (req, res) => {
+    const data = req.body
+
+    if (!data.name || !data.bio) {
+        res.status(400).json({ errorMessage: "Please provide name and bio for the user." });
+        return;
+    }
+
+    try {
+        // add the user to the "database" - try / catch will catch if there is a failure
+        users.push({id: nextId, ...data})
+
+
+    } catch (e) {
+        res.status(500).json({ errorMessage: "There was an error while saving the user to the database"  })
+    }
+});
 
 
 const port = 5000;
