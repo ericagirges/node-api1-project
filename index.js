@@ -94,7 +94,25 @@ server.put("/api/users/:id", (req, res) => {
         res.status(500).json({ errorMessage: "There was an error while saving the user to the database"  })       
     }
 
-})
+});
+
+// DELETE /users/:id
+server.delete("api/users/:id", (req, res) => {
+    const id = req.params.id
+    const found = users.find(user => user.id === id)
+
+    if (!found) {
+        res.status(404).json({ message: "The user with the specified ID does not exist." })
+        return;
+    } 
+    try {
+        const updatedUsers = users.filter(user => user.id !== id)
+        res.status(200).json({ data: updatedUsers })
+    } catch (e) {
+        res.status(500).json({ errorMessage: "The user could not be removed"  })         
+    }
+
+});
 
 
 const port = 5000;
