@@ -13,7 +13,7 @@ server.get("/", (req, res) => {
 // user data
 let users = [
     {
-        id: shortid.generate(),
+        id: "ukrq4h-57",
         name: "Michael Scott",
         bio: "Regional Manager of the Dunder Mifflin Scranton Branch"
     }
@@ -70,6 +70,31 @@ server.post("/api/users", (req, res) => {
         res.status(500).json({ errorMessage: "There was an error while saving the user to the database"  })
     }
 });
+
+// PUT /users/:id
+server.put("/api/users/:id", (req, res) => {
+    const id = req.params.id
+    const found = users.find(user => user.id === id)
+    const changes = req.body
+
+    if (!found) {
+        res.status(404).json({ message: "The user with the specified ID does not exist." })
+        return;
+    }    
+
+    if (!changes.bio || !changes.name) {
+        res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
+        return;
+    }
+
+    try {
+        Object.assign(found, changes)
+        res.status(200).json({ data: users })
+    } catch (e) {
+        res.status(500).json({ errorMessage: "There was an error while saving the user to the database"  })       
+    }
+
+})
 
 
 const port = 5000;
